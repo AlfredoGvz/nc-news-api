@@ -12,3 +12,6 @@
 
   Remember to install dotenv to be able to set up your environment variables. You can use
   the following command on your terminal: npm i dotenv --save
+
+  Once these files are created, remember to add them to the gitignore. These two .env files
+  may contain information that we do not wish to leave out there in the open.
