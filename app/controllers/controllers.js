@@ -1,16 +1,22 @@
-const { collectingTopics, getEndpoints } = require("../models/models.js");
+const {
+  collectingTopics,
+  getEndpoints,
+  getArticles,
+} = require("../models/models.js");
 
-function getAllEndPoints(req, res, next) {
+function fetchAllEndPoints(req, res, next) {
   getEndpoints().then((data) => {
     // console.log(data);
     res.status(200).send({ endpoints: data });
   });
 }
 
-function getTopics(req, res, next) {
+function fetchTopics(req, res, next) {
   collectingTopics().then((data) => {
     res.status(200).send({ topics: data });
   });
 }
 
-module.exports = { getTopics, getAllEndPoints };
+function fetchArticlesById(req, res, next) {}
+
+module.exports = { fetchTopics, fetchAllEndPoints, fetchArticlesById };
