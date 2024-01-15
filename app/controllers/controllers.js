@@ -1,4 +1,8 @@
-const { collectingTopics } = require("../models/models.js");
+const { collectingTopics, getEndpoints } = require("../models/models.js");
+
+function getAllEndPoints(req, res, next) {
+  getEndpoints().then((data) => {});
+}
 
 function getTopics(req, res, next) {
   collectingTopics().then((data) => {
@@ -6,4 +10,4 @@ function getTopics(req, res, next) {
   });
 }
 
-module.exports = { getTopics };
+module.exports = { getTopics, getAllEndPoints };
