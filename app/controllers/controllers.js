@@ -1,7 +1,10 @@
 const { collectingTopics, getEndpoints } = require("../models/models.js");
 
 function getAllEndPoints(req, res, next) {
-  getEndpoints().then((data) => {});
+  getEndpoints().then((data) => {
+    // console.log(data);
+    res.status(200).send({ endpoints: data });
+  });
 }
 
 function getTopics(req, res, next) {

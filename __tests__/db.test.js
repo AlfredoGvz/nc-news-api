@@ -3,6 +3,7 @@ const { app } = require("../app/app.js");
 const seed = require(`../db/seeds/seed.js`);
 const testData = require(`../db/data/test-data/index.js`);
 const db = require(`../db/connection.js`);
+const fs = require("fs/promises");
 
 afterAll(() => {
   return db.end();
@@ -34,11 +35,30 @@ describe("App", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body }) => {
-            const keys = Object.keys(body.topics[0]);
-            expect(keys.includes("slug")).toBe(true);
-            expect(keys.includes("description")).toBe(true);
+            console.log(body.topics, " <<<< my bodyyy");
+            body.topics.forEach((element) => {
+              let objKeys = Object.keys(element);
+              expect(objKeys.includes("slug")).toBe(true);
+              expect(objKeys.includes("description")).toBe(true);
+            });
           });
       });
+    });
+  });
+
+  describe("GET /api", () => {
+    test("Responds with a status of 200", () => {
+      return request(app).get("/api").expect(200);
+    });
+    test("Response returns an object", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then(({ body }) => {
+          console.log(body);
+
+          expect(typeof body.endpoints).toBe("object");
+        });
     });
   });
 });
