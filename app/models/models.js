@@ -2,14 +2,9 @@ const db = require("../../db/connection.js");
 const fs = require("fs/promises");
 
 function getEndpoints() {
-  return fs
-    .readFile(
-      "/home/natsu/Documents/northcoders/07-week-seven-backendPT3/01-monday/nc-news-api/be-nc-news/endpoints.json",
-      "utf-8"
-    )
-    .then((info) => {
-      return JSON.parse(info);
-    });
+  return fs.readFile("endpoints.json", "utf-8").then((info) => {
+    return JSON.parse(info);
+  });
 }
 
 function collectingTopics() {
@@ -18,4 +13,18 @@ function collectingTopics() {
   });
 }
 
-module.exports = { collectingTopics, getEndpoints };
+function getArticles(article_id) {
+  return db
+    .query(
+      `SELECT * FROM articles
+       WHERE article_id = ${article_id}`
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return rows;
+    });
+}
+
+module.exports = { collectingTopics, getEndpoints, getArticles };
