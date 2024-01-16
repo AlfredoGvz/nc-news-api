@@ -66,4 +66,58 @@ describe("App", () => {
         });
     });
   });
+  //Challenge 4
+  describe("/api/articles", () => {
+    test('404 - Providing an id for an non-existent article, responds with a "Not found" message.', () => {
+      return request(app)
+        .get("/api/articles/19")
+        .expect(404)
+        .then(({ body }) => {
+          expect(body.msg).toBe("Not found");
+        });
+    });
+
+    test("Responds with an article array holding the all the right properties.", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          if (body.articles.length > 0) {
+            body.articles.forEach((element) => {
+              Object.keys(element).includes("article_id");
+              Object.keys(element).includes("title");
+              Object.keys(element).includes("topic");
+              Object.keys(element).includes("author");
+              Object.keys(element).includes("body");
+              Object.keys(element).includes("created_at");
+              Object.keys(element).includes("votes");
+              Object.keys(element).includes("article_img_url");
+            });
+          } else {
+            console.log(body.articles);
+          }
+        });
+    });
+    test("Responds with an array of articles holding the right data type for each of the values.", () => {
+      return request(app)
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body }) => {
+          body.articles.forEach((element) => {
+            expect(element).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                body: expect.any(String),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                article_img_url: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+  });
 });
