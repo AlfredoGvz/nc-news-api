@@ -15,8 +15,25 @@ beforeEach(() => {
 
 describe("App", () => {
   describe("/api", () => {
-    describe("GET /topics", () => {
-      test("200 - Responds with a status of 200.", () => {
+    describe("GET /api", () => {
+      test("200- Response returns an object holding information about the different valid enpoints.", () => {
+        return fs
+          .readFile(`endpoints.json`, "utf-8")
+          .then((data) => {
+            return JSON.parse(data);
+          })
+          .then((data) => {
+            return request(app)
+              .get("/api")
+              .expect(200)
+              .then(({ body }) => {
+                expect(body.endpoints).toEqual(data);
+              });
+          });
+      });
+    });
+    describe("GET /api/topics", () => {
+      test("200- Responds with a status of 200.", () => {
         return request(app).get("/api/topics").expect(200);
       });
       test("200- Respponds with an array of data.", () => {
@@ -43,23 +60,7 @@ describe("App", () => {
         return request(app).get("/api/tsopic").expect(404);
       });
     });
-    describe("GET /api", () => {
-      test("200- Response returns an object holding information about the different valid enpoints.", () => {
-        return fs
-          .readFile(`endpoints.json`, "utf-8")
-          .then((data) => {
-            return JSON.parse(data);
-          })
-          .then((data) => {
-            return request(app)
-              .get("/api")
-              .expect(200)
-              .then(({ body }) => {
-                expect(body.endpoints).toEqual(data);
-              });
-          });
-      });
-    });
+
     //Challenge 4
     describe("GET /api/articles/:article_id", () => {
       test("200- Responds with an article array holding the all the right properties.", () => {
@@ -97,7 +98,7 @@ describe("App", () => {
             );
           });
       });
-      test('404 - Providing an id for an non-existent article, responds with a "Not found" message.', () => {
+      test('404- Providing an id for an non-existent article, responds with a "Not found" message.', () => {
         return request(app)
           .get("/api/articles/19")
           .expect(404)
