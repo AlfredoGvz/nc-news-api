@@ -13,18 +13,13 @@ beforeEach(() => {
   return seed(testData);
 });
 
-// console.log(whatComesBack());
 describe("App", () => {
   describe("/api", () => {
     describe("GET /topics", () => {
-      test("Responds with a status of 200", () => {
+      test("200 - Responds with a status of 200.", () => {
         return request(app).get("/api/topics").expect(200);
       });
-      test("Responds witn a 404 if path leads to something that is not contained in the database", () => {
-        return request(app).get("/api/tsopic").expect(404);
-      });
-
-      test("Respponds with an array of data", () => {
+      test("200- Respponds with an array of data.", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
@@ -32,7 +27,7 @@ describe("App", () => {
             expect(Array.isArray(body.topics)).toBe(true);
           });
       });
-      test("Responds with the right properties", () => {
+      test("200- The array of data contains objects holding all the right properties.", () => {
         return request(app)
           .get("/api/topics")
           .expect(200)
@@ -44,10 +39,12 @@ describe("App", () => {
             });
           });
       });
+      test("404- Responds with a 404 if path leads to something non-exiastent in the database.", () => {
+        return request(app).get("/api/tsopic").expect(404);
+      });
     });
     describe("GET /api", () => {
-      test("Response returns an object", () => {
-        //Edit this test description
+      test("200- Response returns an object holding information about the different valid enpoints.", () => {
         return fs
           .readFile(`endpoints.json`, "utf-8")
           .then((data) => {
@@ -65,16 +62,7 @@ describe("App", () => {
     });
     //Challenge 4
     describe("GET /api/articles/:article_id", () => {
-      test('404 - Providing an id for an non-existent article, responds with a "Not found" message.', () => {
-        return request(app)
-          .get("/api/articles/19")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Not found");
-          });
-      });
-
-      test("Responds with an article array holding the all the right properties.", () => {
+      test("200- Responds with an article array holding the all the right properties.", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
@@ -89,8 +77,7 @@ describe("App", () => {
             Object.keys(body.article[0]).includes("article_img_url");
           });
       });
-      test("Responds with an array of articles holding the right data type for each of the values.", () => {
-        //Refactored
+      test("200- Responds with an array of articles holding the right information.", () => {
         return request(app)
           .get("/api/articles/1")
           .expect(200)
@@ -110,6 +97,14 @@ describe("App", () => {
             );
           });
       });
+      test('404 - Providing an id for an non-existent article, responds with a "Not found" message.', () => {
+        return request(app)
+          .get("/api/articles/19")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
+      });
     });
 
     //Task 5
@@ -123,7 +118,7 @@ describe("App", () => {
             expect(Array.isArray(body.articles)).toBe(true);
           });
       });
-      test("200- The array of data contains objects holding all the right properties", () => {
+      test("200- The array of data contains objects holding all the right properties.", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
@@ -141,7 +136,7 @@ describe("App", () => {
             });
           });
       });
-      test("404- Responds with a 'Not found' message", () => {
+      test("404- Responds with a 'Not found' message.", () => {
         return request(app)
           .get("/api/aerticless")
           .expect(404)
