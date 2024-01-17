@@ -4,6 +4,7 @@ const {
   fetchAllEndPoints,
   fetchArticlesById,
   fetchArticles,
+  fetchCommentsByArticleId,
 } = require(`./controllers/controllers.js`);
 
 const app = express();
@@ -12,6 +13,7 @@ app.get("/api", fetchAllEndPoints);
 app.get("/api/topics", fetchTopics);
 app.get("/api/articles/:article_id", fetchArticlesById);
 app.get("/api/articles", fetchArticles);
+app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not found" });

@@ -109,7 +109,6 @@ describe("App", () => {
     });
 
     //Task 5
-
     describe("GET /api/articles", () => {
       test("200- Responds with an array of data.", () => {
         return request(app)
@@ -140,6 +139,60 @@ describe("App", () => {
       test("404- Responds with a 'Not found' message.", () => {
         return request(app)
           .get("/api/aerticless")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
+      });
+    });
+    //Task 6
+    describe("GET /api/articles/:article_id/comments", () => {
+      test("200- Responds with an array of data.", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(Array.isArray(body.comments)).toBe(true);
+          });
+      });
+      test("200- The array of data contains objects holding all the right properties.", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            body.comments.forEach((comment) => {
+              let objKeys = Object.keys(comment);
+              expect(objKeys.includes("comment_id")).toBe(true);
+              expect(objKeys.includes("votes")).toBe(true);
+              expect(objKeys.includes("created_at")).toBe(true);
+              expect(objKeys.includes("author")).toBe(true);
+              expect(objKeys.includes("body")).toBe(true);
+              expect(objKeys.includes("article_id")).toBe(true);
+            });
+          });
+      });
+      test("200- Responds with an array of data sorted by date.", () => {
+        return request(app)
+          .get("/api/articles/1/comments")
+          .expect(200)
+          .then(({ body }) => {
+            console.log(body.comments);
+            expect(body.comments).toBeSortedBy("created_at", {
+              descending: false,
+            });
+          });
+      });
+      test("400- Responds with a message of 'Bad request' when query is not valid.", () => {
+        return request(app)
+          .get("/api/articles/bad_request/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
+      test("404- Responds with a message of 'Not found' acessing an item non-existent in the database.", () => {
+        return request(app)
+          .get("/api/articles/1000/comments")
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("Not found");

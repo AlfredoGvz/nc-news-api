@@ -3,44 +3,55 @@ const {
   getEndpoints,
   getArticlesById,
   getArticles,
+  getArticleComments,
 } = require("../models/models.js");
 
-function fetchAllEndPoints(req, res, next) {
+function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
-    res.status(200).send({ endpoints: data });
+    response.status(200).send({ endpoints: data });
   });
 }
 
-function fetchTopics(req, res, next) {
+function fetchTopics(request, response, next) {
   collectingTopics().then((data) => {
-    res.status(200).send({ topics: data });
+    response.status(200).send({ topics: data });
   });
 }
 
-function fetchArticlesById(req, res, next) {
-  const { article_id } = req.params;
+function fetchArticlesById(request, response, next) {
+  const { article_id } = request.params;
 
   getArticlesById(article_id)
     .then((data) => {
-      res.status(200).send({ article: data });
+      response.status(200).send({ article: data });
     })
     .catch((err) => {
       next(err);
     });
 }
 
-function fetchArticles(req, res, next) {
+function fetchArticles(request, response, next) {
   getArticles()
     .then((data) => {
-      res.status(200).send({ articles: data });
+      response.status(200).send({ articles: data });
     })
     .catch((err) => {
       next(err);
     });
+}
+
+function fetchCommentsByArticleId(request, response, next) {
+  const { article_id } = request.params;
+  getArticleComments(article_id)
+    .then((comments) => {
+      response.status(200).send({ comments: comments });
+    })
+    .catch((err) => next(err));
 }
 module.exports = {
   fetchTopics,
   fetchAllEndPoints,
   fetchArticlesById,
   fetchArticles,
+  fetchCommentsByArticleId,
 };
