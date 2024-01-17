@@ -1,0 +1,4 @@
+ comment_id | body | article_id | author | votes | created_at 
+------------+------+------------+--------+-------+------------
+(0 rows)
+
