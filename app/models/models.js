@@ -49,9 +49,32 @@ function getArticles() {
     });
 }
 
+//6-get-comments-by-article
+function getArticleComments(article_id) {
+  const validId = /[0-9]/;
+  const testId = validId.test(article_id);
+  if (!testId) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+  return db
+    .query(
+      `SELECT * FROM comments
+    WHERE article_id = ${article_id}
+    ORDER BY created_at ASC
+    `
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return rows;
+    });
+}
+
 module.exports = {
   collectingTopics,
   getEndpoints,
   getArticlesById,
   getArticles,
+  getArticleComments,
 };
