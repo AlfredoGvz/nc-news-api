@@ -246,7 +246,7 @@ describe("App", () => {
           });
       });
       //400 comment(body of request) does not exist in resquest
-      test("400- Responds with a 'Bad request' message if request does not include username.", () => {
+      test("400- Responds with a 'Bad request' message if request does not include body.", () => {
         const newComment = {
           username: "butter_bridge",
         };
