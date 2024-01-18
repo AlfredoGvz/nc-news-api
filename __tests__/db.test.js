@@ -63,39 +63,32 @@ describe("App", () => {
 
     //Challenge 4
     describe("GET /api/articles/:article_id", () => {
-      test("200- Responds with an article array holding the all the right properties.", () => {
-        return request(app)
-          .get("/api/articles/1")
-          .expect(200)
-          .then(({ body }) => {
-            Object.keys(body.article[0]).includes("article_id");
-            Object.keys(body.article[0]).includes("title");
-            Object.keys(body.article[0]).includes("topic");
-            Object.keys(body.article[0]).includes("author");
-            Object.keys(body.article[0]).includes("body");
-            Object.keys(body.article[0]).includes("created_at");
-            Object.keys(body.article[0]).includes("votes");
-            Object.keys(body.article[0]).includes("article_img_url");
-          });
-      });
       test("200- Responds with an array of articles holding the right information.", () => {
+        const article = {
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          article_id: 1,
+          body: "I find this existence challenging",
+          topic: "mitch",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        };
         return request(app)
           .get("/api/articles/1")
           .expect(200)
           .then(({ body }) => {
-            expect(body.article[0]).toEqual(
-              expect.objectContaining({
-                author: "butter_bridge",
-                title: "Living in the shadow of a great man",
-                article_id: 1,
-                body: "I find this existence challenging",
-                topic: "mitch",
-                created_at: "2020-07-09T20:11:00.000Z",
-                votes: 100,
-                article_img_url:
-                  "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-              })
-            );
+            expect(body.article[0]).toHaveProperty("article_id");
+            expect(body.article[0]).toHaveProperty("title");
+            expect(body.article[0]).toHaveProperty("topic");
+            expect(body.article[0]).toHaveProperty("author");
+            expect(body.article[0]).toHaveProperty("body");
+            expect(body.article[0]).toHaveProperty("created_at");
+            expect(body.article[0]).toHaveProperty("votes");
+            expect(body.article[0]).toHaveProperty("article_img_url");
+
+            expect(body.article[0]).toMatchObject(article);
           });
       });
       test('404- Providing an id for an non-existent article, responds with a "Not found" message.', () => {
@@ -124,15 +117,17 @@ describe("App", () => {
           .expect(200)
           .then(({ body }) => {
             body.articles.forEach((item) => {
-              let objKeys = Object.keys(item);
-              expect(objKeys.includes("author")).toBe(true);
-              expect(objKeys.includes("title")).toBe(true);
-              expect(objKeys.includes("article_id")).toBe(true);
-              expect(objKeys.includes("topic")).toBe(true);
-              expect(objKeys.includes("created_at")).toBe(true);
-              expect(objKeys.includes("votes")).toBe(true);
-              expect(objKeys.includes("article_img_url")).toBe(true);
-              expect(objKeys.includes("comment_count")).toBe(true);
+              expect(item).toHaveProperty("article_id", expect.any(Number));
+              expect(item).toHaveProperty("title", expect.any(String));
+              expect(item).toHaveProperty("topic", expect.any(String));
+              expect(item).toHaveProperty("author", expect.any(String));
+              expect(item).toHaveProperty("created_at", expect.any(String));
+              expect(item).toHaveProperty("votes", expect.any(Number));
+              expect(item).toHaveProperty(
+                "article_img_url",
+                expect.any(String)
+              );
+              expect(item).toHaveProperty("comment_count");
             });
           });
       });
@@ -176,7 +171,6 @@ describe("App", () => {
           .get("/api/articles/1/comments")
           .expect(200)
           .then(({ body }) => {
-            console.log(body.comments);
             expect(body.comments).toBeSortedBy("created_at", {
               descending: false,
             });
@@ -196,6 +190,31 @@ describe("App", () => {
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("Not found");
+          });
+      });
+    });
+    //Task 7
+    describe("POST /api/articles/:article_id/comments", () => {
+      test("201- Responds with the posted comment.", () => {
+        const newComment = {
+          body: "I suck at coding",
+          username: "butter_bridge",
+        };
+        return request(app)
+          .post("/api/articles/2/comments")
+          .send(newComment)
+          .expect(201)
+          .then(({ body }) => {
+            const comment = body.comment[0];
+            expect(body.comment).toBeInstanceOf(Array);
+            expect(comment).toMatchObject({
+              comment_id: expect.any(Number),
+              body: newComment.body,
+              article_id: 2,
+              author: newComment.username,
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+            });
           });
       });
     });

@@ -1,5 +1,7 @@
 const db = require("../../db/connection.js");
+const { checkArticleExists } = require("../utilities.js");
 const fs = require("fs/promises");
+const format = require("pg-format");
 
 function getEndpoints() {
   return fs.readFile("endpoints.json", "utf-8").then((info) => {
@@ -17,7 +19,8 @@ function getArticlesById(article_id) {
   return db
     .query(
       `SELECT * FROM articles
-       WHERE article_id = ${article_id}`
+       WHERE article_id = $1`,
+      [article_id]
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
@@ -59,9 +62,10 @@ function getArticleComments(article_id) {
   return db
     .query(
       `SELECT * FROM comments
-    WHERE article_id = ${article_id}
-    ORDER BY created_at ASC
-    `
+       WHERE article_id = $1
+       ORDER BY created_at ASC
+    `,
+      [article_id]
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
@@ -71,10 +75,31 @@ function getArticleComments(article_id) {
     });
 }
 
+function insertComment(article_id, username, body) {
+  const checkArticle = checkArticleExists(article_id);
+
+  if (checkArticle) {
+    // const queryVal = [body, article_id, username];
+    const queryValue = format(
+      `INSERT INTO comments
+        (body, article_id, author)
+        VALUES
+        %L
+        RETURNING *;
+       `,
+      [[body, article_id, username]]
+    );
+    return db.query(queryValue).then(({ rows }) => {
+      return rows;
+    });
+  }
+}
+
 module.exports = {
   collectingTopics,
   getEndpoints,
   getArticlesById,
   getArticles,
   getArticleComments,
+  insertComment,
 };

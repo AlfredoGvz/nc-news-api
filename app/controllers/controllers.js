@@ -4,8 +4,9 @@ const {
   getArticlesById,
   getArticles,
   getArticleComments,
+  insertComment,
 } = require("../models/models.js");
-
+const { checkArticleExists } = require("../utilities.js");
 function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
     response.status(200).send({ endpoints: data });
@@ -48,10 +49,22 @@ function fetchCommentsByArticleId(request, response, next) {
     })
     .catch((err) => next(err));
 }
+
+function addCommentToArticle(request, response, next) {
+  const { article_id } = request.params;
+  const { username, body } = request.body;
+  insertComment(article_id, username, body)
+    .then((data) => {
+      response.status(201).send({ comment: data });
+    })
+    .catch((err) => next(err));
+}
+
 module.exports = {
   fetchTopics,
   fetchAllEndPoints,
   fetchArticlesById,
   fetchArticles,
   fetchCommentsByArticleId,
+  addCommentToArticle,
 };
