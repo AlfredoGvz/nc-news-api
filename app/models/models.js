@@ -54,6 +54,7 @@ function getArticles() {
 
 //6-get-comments-by-article
 function getArticleComments(article_id) {
+  //Deal with this later
   const validId = /[0-9]/;
   const testId = validId.test(article_id);
   if (!testId) {
@@ -75,11 +76,9 @@ function getArticleComments(article_id) {
     });
 }
 
-function insertComment(article_id, username, body) {
-  const checkArticle = checkArticleExists(article_id);
-
+async function insertComment(article_id, username, body) {
+  const checkArticle = await checkArticleExists(article_id);
   if (checkArticle) {
-    // const queryVal = [body, article_id, username];
     const queryValue = format(
       `INSERT INTO comments
         (body, article_id, author)

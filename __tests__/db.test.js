@@ -217,6 +217,47 @@ describe("App", () => {
             });
           });
       });
+      //Test for sad days:
+      //404 article id poits to a non-existent article
+      test("404- Responds with a 'Not found' message given a non-existen article in databse.", () => {
+        const newComment = {
+          body: "I suck at coding",
+          username: "butter_bridge",
+        };
+        return request(app)
+          .post("/api/articles/200/comments")
+          .send(newComment)
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
+      });
+      //404 username does not exist
+      test("400- Responds with a 'Bad request' message if request does not include username.", () => {
+        const newComment = {
+          body: "I suck at coding",
+        };
+        return request(app)
+          .post("/api/articles/2/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
+      //400 comment(body of request) does not exist in resquest
+      test("400- Responds with a 'Bad request' message if request does not include username.", () => {
+        const newComment = {
+          username: "butter_bridge",
+        };
+        return request(app)
+          .post("/api/articles/2/comments")
+          .send(newComment)
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
     });
   });
 });

@@ -53,6 +53,9 @@ function fetchCommentsByArticleId(request, response, next) {
 function addCommentToArticle(request, response, next) {
   const { article_id } = request.params;
   const { username, body } = request.body;
+  if (!username || !body) {
+    response.status(400).send({ msg: "Bad request" });
+  }
   insertComment(article_id, username, body)
     .then((data) => {
       response.status(201).send({ comment: data });

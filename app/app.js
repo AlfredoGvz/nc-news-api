@@ -44,11 +44,6 @@ app.use((err, req, res, next) => {
   }
 });
 
-app.use((err, req, res, next) => {
-  console.log(err, "<<< 500 CUSTOM ERROR");
-  res.status(500).send({ msg: "Internal Server Error" });
-});
-
 //POSTGRES ERRORS
 app.use((err, req, res, next) => {
   console.log(err, "<<< 404 POSTGRES");
@@ -59,4 +54,8 @@ app.use((err, req, res, next) => {
   }
 });
 
+app.use((err, req, res, next) => {
+  console.log(err, "<<< 500 CUSTOM ERROR");
+  res.status(500).send({ msg: "Internal Server Error" });
+});
 module.exports = { app };
