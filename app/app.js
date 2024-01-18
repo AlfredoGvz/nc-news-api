@@ -5,15 +5,21 @@ const {
   fetchArticlesById,
   fetchArticles,
   fetchCommentsByArticleId,
+  addCommentToArticle,
 } = require(`./controllers/controllers.js`);
 
 const app = express();
+
+app.use(express.json());
 
 app.get("/api", fetchAllEndPoints);
 app.get("/api/topics", fetchTopics);
 app.get("/api/articles/:article_id", fetchArticlesById);
 app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
+app.post("/api/articles/:article_id/comments", addCommentToArticle);
+
+//================================================//
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "Not found" });
@@ -35,9 +41,16 @@ app.use((err, req, res, next) => {
   }
 });
 
+//POSTGRES ERRORS
 app.use((err, req, res, next) => {
-  console.log(err);
-  res.status(500).send({ msg: "Internal Server Error" });
+  if (err.code === 23503) {
+    res.status(404).send({ msg: "Not found" });
+  } else {
+    next(err);
+  }
 });
 
+app.use((err, req, res, next) => {
+  res.status(500).send({ msg: "Internal Server Error" });
+});
 module.exports = { app };
