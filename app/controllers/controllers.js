@@ -66,11 +66,14 @@ function addCommentToArticle(request, response, next) {
 
 function updateArticleById(request, response, next) {
   const { article_id } = request.params;
+  const vote_update = request.body;
 
-  updateArticle(article_id, request.body).then((data) => {
-    console.log("data");
-    response.status(200).send({ update: data });
-  });
+  updateArticle(article_id, vote_update)
+    .then((data) => {
+      console.log(data, "<<<Data");
+      response.status(200).send({ update: data });
+    })
+    .catch((err) => next(err));
 }
 
 module.exports = {

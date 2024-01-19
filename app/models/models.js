@@ -78,9 +78,7 @@ function getArticleComments(article_id) {
 
 async function insertComment(article_id, username, body) {
   const checkArticle = await checkArticleExists(article_id);
-  if (checkArticle.length === 0) {
-    return Promise.reject({ status: 404, mgs: "Not found" });
-  } else {
+  if (checkArticle) {
     const queryValue = format(
       `INSERT INTO comments
         (body, article_id, author)
@@ -96,20 +94,22 @@ async function insertComment(article_id, username, body) {
   }
 }
 
-async function updateArticle(article_id, vote_update) {
-  const checkExistence = await checkArticleExists(article_id);
-  if (checkExistence.length === 0) {
-    return Promise.reject({ status: 404, mgs: "Not found" });
-  }
-  console.log("I am here");
+function updateArticle(article_id, vote_update) {
   const updateValue = vote_update.inc_votes;
-  const queryValue = `UPDATE articles SET votes = votes+$1 WHERE article_id=$2 RETURNING *`;
-  return db.query(queryValue, [updateValue, article_id]).then(({ rows }) => {
-    console.log(rows);
-    return rows;
-  });
+  console.log(article_id);
+  return db
+    .query(
+      `UPDATE articles SET votes = votes+$1 WHERE article_id=$2 RETURNING *`,
+      [updateValue, article_id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        console.log(rows, "I am the row");
+        return Promise.reject({ status: 404, msg: "Not found" });
+      }
+      return rows;
+    });
 }
-
 module.exports = {
   collectingTopics,
   getEndpoints,
