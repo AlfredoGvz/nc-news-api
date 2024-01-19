@@ -7,7 +7,7 @@ const {
   fetchCommentsByArticleId,
   addCommentToArticle,
   updateArticleById,
-} = require(`./controllers/controllers.js`);
+} = require(`./app/controllers/controllers.js`);
 
 const app = express();
 
