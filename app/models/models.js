@@ -110,7 +110,6 @@ function updateArticle(article_id, vote_update) {
       return rows;
     });
 }
-
 module.exports = {
   collectingTopics,
   getEndpoints,
