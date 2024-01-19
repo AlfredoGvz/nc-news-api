@@ -60,7 +60,6 @@ describe("App", () => {
         return request(app).get("/api/tsopic").expect(404);
       });
     });
-
     //Challenge 4
     describe("GET /api/articles/:article_id", () => {
       test("200- Responds with an array of articles holding the right information.", () => {
@@ -100,8 +99,7 @@ describe("App", () => {
           });
       });
     });
-
-    //Task 5
+    //Ticket 5
     describe("GET /api/articles", () => {
       test("200- Responds with an array of data.", () => {
         return request(app)
@@ -140,7 +138,7 @@ describe("App", () => {
           });
       });
     });
-    //Task 6
+    //Ticket 6
     describe("GET /api/articles/:article_id/comments", () => {
       test("200- Responds with an array of data.", () => {
         return request(app)
@@ -193,7 +191,7 @@ describe("App", () => {
           });
       });
     });
-    //Task 7
+    //Ticket 7
     describe("POST /api/articles/:article_id/comments", () => {
       test("201- Responds with the posted comment.", () => {
         const newComment = {
@@ -217,8 +215,6 @@ describe("App", () => {
             });
           });
       });
-      //Test for sad days:
-      //404 article id poits to a non-existent article
       test("404- Responds with a 'Not found' message given a non-existen article in databse.", () => {
         const newComment = {
           body: "I suck at coding",
@@ -232,7 +228,6 @@ describe("App", () => {
             expect(body.msg).toBe("Not found");
           });
       });
-      //404 username does not exist
       test("400- Responds with a 'Bad request' message if request does not include username.", () => {
         const newComment = {
           body: "I suck at coding",
@@ -245,7 +240,6 @@ describe("App", () => {
             expect(body.msg).toBe("Bad request");
           });
       });
-      //400 comment(body of request) does not exist in resquest
       test("400- Responds with a 'Bad request' message if request does not include body.", () => {
         const newComment = {
           username: "butter_bridge",
@@ -256,6 +250,39 @@ describe("App", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe("Bad request");
+          });
+      });
+    });
+    //Ticket 8
+    describe("PATCH /api/articles/:article_id", () => {
+      test("200- Responds with the updated information.", () => {
+        return request(app)
+          .patch("/api/articles/7")
+          .send({ inc_votes: 1 })
+          .expect(200)
+          .then(({ body }) => {
+            const update = body.update;
+            expect(update).toBeInstanceOf(Array);
+            expect(update[0]).toMatchObject({
+              article_id: 7,
+              title: "Z",
+              topic: "mitch",
+              author: "icellusedkars",
+              body: "I was hungry.",
+              created_at: "2020-01-07T14:08:00.000Z",
+              votes: 1,
+              article_img_url:
+                "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            });
+          });
+      });
+      test("404- Responds with 'Not found' given the accessed article does not exist.", () => {
+        return request(app)
+          .patch("/api/articles/99")
+          .send({ inc_votes: 1 })
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
           });
       });
     });
