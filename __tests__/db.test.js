@@ -13,7 +13,7 @@ beforeEach(() => {
   return seed(testData);
 });
 
-describe.skip("App", () => {
+describe("App", () => {
   describe("/api", () => {
     describe("GET /api", () => {
       test("200- Response returns an object holding information about the different valid enpoints.", () => {
@@ -254,7 +254,7 @@ describe.skip("App", () => {
       });
     });
     //Ticket 8
-    describe.skip("PATCH /api/articles/:article_id", () => {
+    describe("PATCH /api/articles/:article_id", () => {
       test("200- Responds with the updated information.", () => {
         return request(app)
           .patch("/api/articles/7")
@@ -276,12 +276,13 @@ describe.skip("App", () => {
             });
           });
       });
-      test.skip("404- Responds with 'Not found' given the accessed article does not exist.", () => {
+      test("404- Responds with 'Not found' given the accessed article does not exist.", () => {
         return request(app)
           .patch("/api/articles/99")
           .send({ inc_votes: 1 })
           .expect(404)
           .then(({ body }) => {
+            console.log(body);
             expect(body.msg).toBe("Not found");
           });
       });
