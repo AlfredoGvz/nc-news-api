@@ -6,6 +6,7 @@ const {
   getArticleComments,
   insertComment,
   updateArticle,
+  deleteComment,
 } = require("../models/models.js");
 const { checkArticleExists } = require("../utilities.js");
 function fetchAllEndPoints(request, response, next) {
@@ -70,7 +71,6 @@ function updateArticleById(request, response, next) {
 
   updateArticle(article_id, vote_update)
     .then((data) => {
-      console.log(data, "<<<Data");
       response.status(200).send({ update: data });
     })
     .catch((err) => next(err));
@@ -78,14 +78,12 @@ function updateArticleById(request, response, next) {
 
 function deleteCommentByCommentId(request, response, next) {
   const { comment_id } = request.params;
+
   deleteComment(comment_id)
-    .then((message) => {
-      console.log(message);
-      response.status(204).send({ msg: message });
+    .then((result) => {
+      response.status(204).send({ resultado: result });
     })
-    .catch((err) => {
-      console.log(err, "I am the error");
-    });
+    .catch((err) => next(err));
 }
 
 module.exports = {

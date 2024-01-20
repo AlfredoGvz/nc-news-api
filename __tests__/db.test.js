@@ -282,15 +282,23 @@ describe("App", () => {
           .send({ inc_votes: 1 })
           .expect(404)
           .then(({ body }) => {
-            console.log(body);
             expect(body.msg).toBe("Not found");
           });
       });
     });
-    //Ticket 9
+    // Ticket 9
     describe("DELETE /api/comments/:comment_id", () => {
       test("204- Responds with the deleted item.", () => {
-        return request(app).delete("/api/comments/18").expect(204);
+        //look into this latter
+        return request(app).delete("/api/comments/9").expect(204);
+      });
+      test("404- Responds with 'Not found' if comment does not exist.", () => {
+        return request(app)
+          .delete("/api/comments/9000")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
       });
     });
   });

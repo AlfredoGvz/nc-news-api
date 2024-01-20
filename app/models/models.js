@@ -1,5 +1,5 @@
 const db = require("../../db/connection.js");
-const { checkArticleExists } = require("../utilities.js");
+const { checkArticleExists, checkCommentExists } = require("../utilities.js");
 const fs = require("fs/promises");
 const format = require("pg-format");
 
@@ -96,7 +96,6 @@ async function insertComment(article_id, username, body) {
 
 function updateArticle(article_id, vote_update) {
   const updateValue = vote_update.inc_votes;
-  console.log(article_id);
   return db
     .query(
       `UPDATE articles SET votes = votes+$1 WHERE article_id=$2 RETURNING *`,
@@ -104,19 +103,23 @@ function updateArticle(article_id, vote_update) {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        console.log(rows, "I am the row");
         return Promise.reject({ status: 404, msg: "Not found" });
       }
       return rows;
     });
 }
-function deleteComment(comment_id) {
-  return db
-    .query(`DELETE FROM comments WHERE comment_id=$1`, [comment_id])
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-      }
-    });
+
+async function deleteComment(comment_id) {
+  const checkData = await checkCommentExists(comment_id);
+  if (checkData.length !== 0) {
+    return db
+      .query(`DELETE FROM comments WHERE comment_id=$1`, [comment_id])
+      .then(({ rows }) => {
+        return rows;
+      });
+  } else {
+    return Promise.reject({ status: 404, msg: "Not found" });
+  }
 }
 module.exports = {
   collectingTopics,
