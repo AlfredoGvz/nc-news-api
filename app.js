@@ -7,6 +7,7 @@ const {
   fetchCommentsByArticleId,
   addCommentToArticle,
   updateArticleById,
+  deleteCommentByCommentId,
 } = require(`./app/controllers/controllers.js`);
 
 const app = express();
@@ -20,6 +21,7 @@ app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", addCommentToArticle);
 app.patch("/api/articles/:article_id", updateArticleById);
+app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
 
 //================================================//
 
@@ -42,7 +44,6 @@ app.use((err, req, res, next) => {
     next(err);
   }
 });
-
 //POSTGRES ERRORS
 app.use((err, req, res, next) => {
   if (err.code === 23503) {

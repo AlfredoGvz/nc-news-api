@@ -76,6 +76,18 @@ function updateArticleById(request, response, next) {
     .catch((err) => next(err));
 }
 
+function deleteCommentByCommentId(request, response, next) {
+  const { comment_id } = request.params;
+  deleteComment(comment_id)
+    .then((message) => {
+      console.log(message);
+      response.status(204).send({ msg: message });
+    })
+    .catch((err) => {
+      console.log(err, "I am the error");
+    });
+}
+
 module.exports = {
   fetchTopics,
   fetchAllEndPoints,
@@ -84,4 +96,5 @@ module.exports = {
   fetchCommentsByArticleId,
   addCommentToArticle,
   updateArticleById,
+  deleteCommentByCommentId,
 };

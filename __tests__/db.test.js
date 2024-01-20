@@ -287,5 +287,11 @@ describe("App", () => {
           });
       });
     });
+    //Ticket 9
+    describe("DELETE /api/comments/:comment_id", () => {
+      test("204- Responds with the deleted item.", () => {
+        return request(app).delete("/api/comments/18").expect(204);
+      });
+    });
   });
 });
