@@ -285,12 +285,26 @@ describe("App", () => {
             expect(body.msg).toBe("Not found");
           });
       });
+      test("400- Responds with 'Bad reuqest' given the accessed article does not exist.", () => {
+        return request(app)
+          .patch("/api/articles/bananas")
+          .send({ inc_votes: 1 })
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
     });
     // Ticket 9
-    describe("DELETE /api/comments/:comment_id", () => {
+    describe.only("DELETE /api/comments/:comment_id", () => {
       test("204- Responds with the deleted item.", () => {
         //look into this latter
-        return request(app).delete("/api/comments/9").expect(204);
+        return request(app)
+          .delete("/api/comments/9")
+          .expect(204)
+          .then(({ body }) => {
+            console.log(body, "I am in the test");
+          });
       });
       test("404- Responds with 'Not found' if comment does not exist.", () => {
         return request(app)
@@ -298,6 +312,14 @@ describe("App", () => {
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("Not found");
+          });
+      });
+      test("400- Responds with 'Bad request' if ", () => {
+        return request(app)
+          .delete("/api/comments/bad_id_input")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
           });
       });
     });

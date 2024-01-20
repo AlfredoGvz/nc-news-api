@@ -20,5 +20,12 @@ function checkCommentExists(comment_id) {
       return rows;
     });
 }
+function checkValidId(id) {
+  const validId = /[0-9]/;
+  const testId = validId.test(id);
+  if (!testId) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+}
 
-module.exports = { checkArticleExists, checkCommentExists };
+module.exports = { checkArticleExists, checkCommentExists, checkValidId };

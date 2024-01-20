@@ -81,7 +81,8 @@ function deleteCommentByCommentId(request, response, next) {
 
   deleteComment(comment_id)
     .then((result) => {
-      response.status(204).send({ resultado: result });
+      console.log(result, "in controller, Delete method returned rows");
+      response.status(204).send({ update: result });
     })
     .catch((err) => next(err));
 }

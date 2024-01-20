@@ -45,7 +45,8 @@ function getArticles() {
       FROM articles 
       LEFT JOIN comments ON 
       articles.article_id = comments.article_id 
-      GROUP BY articles.article_id`
+      GROUP BY articles.article_id
+      ORDER BY article_id ASC`
     )
     .then(({ rows }) => {
       return rows;
@@ -96,6 +97,12 @@ async function insertComment(article_id, username, body) {
 
 function updateArticle(article_id, vote_update) {
   const updateValue = vote_update.inc_votes;
+  const validId = /[0-9]/;
+  const testId = validId.test(article_id);
+  if (!testId) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
+
   return db
     .query(
       `UPDATE articles SET votes = votes+$1 WHERE article_id=$2 RETURNING *`,
@@ -110,11 +117,17 @@ function updateArticle(article_id, vote_update) {
 }
 
 async function deleteComment(comment_id) {
+  const validId = /[0-9]/;
+  const testId = validId.test(comment_id);
+  if (!testId) {
+    return Promise.reject({ status: 400, msg: "Bad request" });
+  }
   const checkData = await checkCommentExists(comment_id);
   if (checkData.length !== 0) {
     return db
       .query(`DELETE FROM comments WHERE comment_id=$1`, [comment_id])
       .then(({ rows }) => {
+        console.log(rows, "in Model, Delete method returned rows");
         return rows;
       });
   } else {
