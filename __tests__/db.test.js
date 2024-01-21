@@ -113,11 +113,12 @@ describe("App", () => {
     });
     //Ticket 5
     describe("GET /api/articles", () => {
-      test("200- Responds with an array of data.", () => {
+      test("200- Responds with an array of data (Ticket 5).", () => {
         return request(app)
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
+            // console.log(body, "in the test");
             expect(body.articles).toBeInstanceOf(Array);
           });
       });
@@ -345,7 +346,6 @@ describe("App", () => {
           .expect(200)
           .then(({ body }) => {
             const users = body.users;
-            console.log(body);
             expect(users).toBeInstanceOf(Array);
           });
       });
@@ -355,7 +355,6 @@ describe("App", () => {
           .expect(200)
           .then(({ body }) => {
             const users = body.users;
-            console.log(body);
             users.forEach((user) => {
               expect(user).toHaveProperty("username", expect.any(String));
               expect(user).toHaveProperty("name", expect.any(String));
@@ -375,15 +374,35 @@ describe("App", () => {
 
     //ticket 11
     describe("GET /api/articles?query=query_val", () => {
+      /*
+      This query is linked to the fetchArticles() controller on line 38
+      */
       test("200- Filters out an item specified by the query.", () => {
         return request(app)
-          .get("/api/articles?topic=cats")
+          .get("/api/articles?topic=mitch")
           .expect(200)
           .then(({ body }) => {
-            body.article.forEach((article) => {
-              expect(article).toHaveProperty("title", expect.any(String));
-              expect(article).toHaveProperty("topic");
+            body.articles.forEach((article) => {
+              expect(article.topic).toBe("mitch");
             });
+          });
+      });
+
+      test("200- Responds with an array of data sorted by query value.", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("topic");
+          });
+      });
+      test("404- returns a 'Not found' message if value of query is not contained in the database.", () => {
+        return request(app)
+          .get("/api/articles?topic=elemental_variable")
+          .expect(404)
+          .then(({ body }) => {
+            // console.log();
+            expect(body.msg).toBe("Not found");
           });
       });
     });

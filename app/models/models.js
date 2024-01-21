@@ -30,10 +30,9 @@ function getArticlesById(article_id) {
     });
 }
 
-function getArticles() {
-  return db
-    .query(
-      `SELECT 
+function getArticles(topic) {
+  const queryValues = [];
+  let queryString = `SELECT 
       articles.article_id,
       articles.title, 
       articles.topic,
@@ -44,12 +43,21 @@ function getArticles() {
       COUNT(comments.comment_id) AS comment_count
       FROM articles 
       LEFT JOIN comments ON 
-      articles.article_id = comments.article_id 
-      GROUP BY articles.article_id`
-    )
-    .then(({ rows }) => {
-      return rows;
-    });
+      articles.article_id = comments.article_id `;
+
+  if (topic) {
+    queryString += `WHERE articles.topic=$1`;
+    queryValues.push(topic);
+  }
+
+  queryString += ` GROUP BY articles.article_id`;
+
+  return db.query(queryString, queryValues).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Not found" });
+    }
+    return rows;
+  });
 }
 
 //6-get-comments-by-article
