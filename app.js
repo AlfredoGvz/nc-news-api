@@ -9,7 +9,6 @@ const {
   updateArticleById,
   deleteCommentByCommentId,
   fetchUsers,
-  filterArticlesByTopic,
 } = require(`./app/controllers/controllers.js`);
 
 const app = express();
@@ -25,7 +24,6 @@ app.post("/api/articles/:article_id/comments", addCommentToArticle);
 app.patch("/api/articles/:article_id", updateArticleById);
 app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
 app.get("/api/users", fetchUsers);
-app.get("/api/articles?topic=cats", filterArticlesByTopic);
 
 //================================================//
 

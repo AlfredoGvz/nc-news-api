@@ -10,7 +10,6 @@ const {
   getUsers,
   filteredArticles,
 } = require("../models/models.js");
-const { checkArticleExists } = require("../utilities.js");
 function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
     response.status(200).send({ endpoints: data });
@@ -36,8 +35,10 @@ function fetchArticlesById(request, response, next) {
 }
 
 function fetchArticles(request, response, next) {
-  getArticles()
+  const { topic } = request.query;
+  getArticles(topic)
     .then((data) => {
+      // console.log(data, "artilcles");
       response.status(200).send({ articles: data });
     })
     .catch((err) => {
@@ -89,8 +90,6 @@ function deleteCommentByCommentId(request, response, next) {
 }
 
 function fetchUsers(request, response, next) {
-  console.log("Am i here?");
-
   getUsers()
     .then((users) => {
       response.status(200).send({ users: users });
@@ -98,13 +97,7 @@ function fetchUsers(request, response, next) {
     .catch((err) => next(err));
 }
 
-function filterArticlesByTopic(request, response, next) {
-  const { topic } = request.query;
-
-  filteredArticles(topic).then((filteredArticles) => {
-    response.status(200).send({ filteredItems: filteredArticles });
-  });
-}
+function filterArticlesByTopic(request, response, next) {}
 
 module.exports = {
   fetchTopics,

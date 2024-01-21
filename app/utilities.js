@@ -20,6 +20,7 @@ function checkCommentExists(comment_id) {
       return rows;
     });
 }
+
 function checkValidId(id) {
   const validId = /[0-9]/;
   const testId = validId.test(id);
@@ -27,5 +28,16 @@ function checkValidId(id) {
     return Promise.reject({ status: 400, msg: "Bad request" });
   }
 }
+function returnValidQueryValues() {
+  return db.query(`SELECT DISTINCT topic FROM articles;`).then(({ rows }) => {
+    const allowedQueryValues = rows.map((element) => element.topic);
+    return allowedQueryValues;
+  });
+}
 
-module.exports = { checkArticleExists, checkCommentExists, checkValidId };
+module.exports = {
+  checkArticleExists,
+  checkCommentExists,
+  checkValidId,
+  returnValidQueryValues,
+};
