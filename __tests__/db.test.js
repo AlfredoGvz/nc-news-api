@@ -41,7 +41,7 @@ describe("App", () => {
           .get("/api/topics")
           .expect(200)
           .then(({ body }) => {
-            expect(Array.isArray(body.topics)).toBe(true);
+            expect(body.topics).toBeInstanceOf(Array);
           });
       });
       test("200- The array of data contains objects holding all the right properties.", () => {
@@ -50,14 +50,18 @@ describe("App", () => {
           .expect(200)
           .then(({ body }) => {
             body.topics.forEach((element) => {
-              let objKeys = Object.keys(element);
-              expect(objKeys.includes("slug")).toBe(true);
-              expect(objKeys.includes("description")).toBe(true);
+              expect(element).toHaveProperty("slug", expect.any(String));
+              expect(element).toHaveProperty("description", expect.any(String));
             });
           });
       });
-      test("404- Responds with a 404 if path leads to something non-exiastent in the database.", () => {
-        return request(app).get("/api/tsopic").expect(404);
+      test("404- Responds with a 'Not found' if accessed a wrong enpoint", () => {
+        return request(app)
+          .get("/api/tsopic")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
       });
     });
     //Challenge 4
@@ -98,6 +102,14 @@ describe("App", () => {
             expect(body.msg).toBe("Not found");
           });
       });
+      test("400- Responds with a message of 'Bad request' when query uses a non-valid article id.", () => {
+        return request(app)
+          .get("/api/articles/bananas")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
+          });
+      });
     });
     //Ticket 5
     describe("GET /api/articles", () => {
@@ -106,7 +118,7 @@ describe("App", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(Array.isArray(body.articles)).toBe(true);
+            expect(body.articles).toBeInstanceOf(Array);
           });
       });
       test("200- The array of data contains objects holding all the right properties.", () => {
@@ -129,7 +141,7 @@ describe("App", () => {
             });
           });
       });
-      test("404- Responds with a 'Not found' message.", () => {
+      test("404- Responds with a 'Not found' message when accessing an endpoint to an unexistent piece of data in databse.", () => {
         return request(app)
           .get("/api/aerticless")
           .expect(404)
@@ -145,7 +157,7 @@ describe("App", () => {
           .get("/api/articles/1/comments")
           .expect(200)
           .then(({ body }) => {
-            expect(Array.isArray(body.comments)).toBe(true);
+            expect(body.comments).toBeInstanceOf(Array);
           });
       });
       test("200- The array of data contains objects holding all the right properties.", () => {
@@ -154,13 +166,12 @@ describe("App", () => {
           .expect(200)
           .then(({ body }) => {
             body.comments.forEach((comment) => {
-              let objKeys = Object.keys(comment);
-              expect(objKeys.includes("comment_id")).toBe(true);
-              expect(objKeys.includes("votes")).toBe(true);
-              expect(objKeys.includes("created_at")).toBe(true);
-              expect(objKeys.includes("author")).toBe(true);
-              expect(objKeys.includes("body")).toBe(true);
-              expect(objKeys.includes("article_id")).toBe(true);
+              expect(comment).toHaveProperty("comment_id", expect.any(Number));
+              expect(comment).toHaveProperty("votes", expect.any(Number));
+              expect(comment).toHaveProperty("created_at", expect.any(String));
+              expect(comment).toHaveProperty("author", expect.any(String));
+              expect(comment).toHaveProperty("body", expect.any(String));
+              expect(comment).toHaveProperty("article_id", expect.any(Number));
             });
           });
       });
@@ -174,20 +185,20 @@ describe("App", () => {
             });
           });
       });
-      test("400- Responds with a message of 'Bad request' when query is not valid.", () => {
-        return request(app)
-          .get("/api/articles/bad_request/comments")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("Bad request");
-          });
-      });
       test("404- Responds with a message of 'Not found' acessing an item non-existent in the database.", () => {
         return request(app)
           .get("/api/articles/1000/comments")
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("Not found");
+          });
+      });
+      test("400- Responds with a message of 'Bad request' when query uses a non-valid article id.", () => {
+        return request(app)
+          .get("/api/articles/bad_request/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
           });
       });
     });
@@ -285,7 +296,7 @@ describe("App", () => {
             expect(body.msg).toBe("Not found");
           });
       });
-      test("400- Responds with 'Bad reuqest' given the accessed article does not exist.", () => {
+      test("400- Responds with a message of 'Bad request' when query uses a non-valid article id.", () => {
         return request(app)
           .patch("/api/articles/bananas")
           .send({ inc_votes: 1 })
@@ -296,14 +307,17 @@ describe("App", () => {
       });
     });
     // Ticket 9
-    describe.only("DELETE /api/comments/:comment_id", () => {
-      test("204- Responds with the deleted item.", () => {
-        //look into this latter
+    describe("DELETE /api/comments/:comment_id", () => {
+      test("200- Responds with the deleted item.", () => {
+        /*a 204 status code indicates "No Content,"
+         which explicitly states there shouldn't be a body in the response.
+         If you need to return data, use a different status code like 200 (OK).*/
         return request(app)
           .delete("/api/comments/9")
-          .expect(204)
+          .expect(200)
           .then(({ body }) => {
-            console.log(body, "I am in the test");
+            expect(body.update).toBeInstanceOf(Array);
+            expect(body.update).toEqual([]);
           });
       });
       test("404- Responds with 'Not found' if comment does not exist.", () => {
@@ -314,12 +328,62 @@ describe("App", () => {
             expect(body.msg).toBe("Not found");
           });
       });
-      test("400- Responds with 'Bad request' if ", () => {
+      test("400- Responds with a message of 'Bad request' when query uses a non-valid comment id. ", () => {
         return request(app)
           .delete("/api/comments/bad_id_input")
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe("Bad request");
+          });
+      });
+    });
+    //Ticket 10
+    describe("GET /api/users", () => {
+      test("200- Responds with an array of data.", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            const users = body.users;
+            console.log(body);
+            expect(users).toBeInstanceOf(Array);
+          });
+      });
+      test("200- Responds with an array of data containing objects holding the right information.", () => {
+        return request(app)
+          .get("/api/users")
+          .expect(200)
+          .then(({ body }) => {
+            const users = body.users;
+            console.log(body);
+            users.forEach((user) => {
+              expect(user).toHaveProperty("username", expect.any(String));
+              expect(user).toHaveProperty("name", expect.any(String));
+              expect(user).toHaveProperty("avatar_url", expect.any(String));
+            });
+          });
+      });
+      test("404- Responds with a 'Not found' message given a non-existen article in databse.", () => {
+        return request(app)
+          .get("/api/not_right_endpoint")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Not found");
+          });
+      });
+    });
+
+    //ticket 11
+    describe("GET /api/articles?query=query_val", () => {
+      test("200- Filters out an item specified by the query.", () => {
+        return request(app)
+          .get("/api/articles?topic=cats")
+          .expect(200)
+          .then(({ body }) => {
+            body.article.forEach((article) => {
+              expect(article).toHaveProperty("title", expect.any(String));
+              expect(article).toHaveProperty("topic");
+            });
           });
       });
     });

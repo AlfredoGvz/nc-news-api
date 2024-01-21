@@ -7,6 +7,8 @@ const {
   insertComment,
   updateArticle,
   deleteComment,
+  getUsers,
+  filteredArticles,
 } = require("../models/models.js");
 const { checkArticleExists } = require("../utilities.js");
 function fetchAllEndPoints(request, response, next) {
@@ -81,10 +83,27 @@ function deleteCommentByCommentId(request, response, next) {
 
   deleteComment(comment_id)
     .then((result) => {
-      console.log(result, "in controller, Delete method returned rows");
-      response.status(204).send({ update: result });
+      response.status(200).send({ update: result });
     })
     .catch((err) => next(err));
+}
+
+function fetchUsers(request, response, next) {
+  console.log("Am i here?");
+
+  getUsers()
+    .then((users) => {
+      response.status(200).send({ users: users });
+    })
+    .catch((err) => next(err));
+}
+
+function filterArticlesByTopic(request, response, next) {
+  const { topic } = request.query;
+
+  filteredArticles(topic).then((filteredArticles) => {
+    response.status(200).send({ filteredItems: filteredArticles });
+  });
 }
 
 module.exports = {
@@ -96,4 +115,6 @@ module.exports = {
   addCommentToArticle,
   updateArticleById,
   deleteCommentByCommentId,
+  fetchUsers,
+  filterArticlesByTopic,
 };

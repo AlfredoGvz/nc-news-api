@@ -8,6 +8,8 @@ const {
   addCommentToArticle,
   updateArticleById,
   deleteCommentByCommentId,
+  fetchUsers,
+  filterArticlesByTopic,
 } = require(`./app/controllers/controllers.js`);
 
 const app = express();
@@ -22,6 +24,8 @@ app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
 app.post("/api/articles/:article_id/comments", addCommentToArticle);
 app.patch("/api/articles/:article_id", updateArticleById);
 app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
+app.get("/api/users", fetchUsers);
+app.get("/api/articles?topic=cats", filterArticlesByTopic);
 
 //================================================//
 
@@ -46,8 +50,15 @@ app.use((err, req, res, next) => {
 });
 //POSTGRES ERRORS
 app.use((err, req, res, next) => {
-  if (err.code === 23503) {
+  if (err.code === "23503") {
     res.status(404).send({ msg: "Not found" });
+  } else {
+    next(err);
+  }
+});
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    res.status(400).send({ msg: "Bad request" });
   } else {
     next(err);
   }
