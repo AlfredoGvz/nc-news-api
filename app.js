@@ -11,6 +11,9 @@ const {
   fetchUsers,
 } = require(`./app/controllers/controllers.js`);
 
+const cors = require("cors");
+app.use(cors());
+
 const app = express();
 
 app.use(express.json());

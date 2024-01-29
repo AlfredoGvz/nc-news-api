@@ -20,7 +20,7 @@
 
 - You can clone this repository by clicking on code, then copying the HTTPS link.
   On your computer, open your terminal and select the path you with to clone the repo into.
-  Then trype on the terminal: git clone <paste the link you just copied>
+  Then type: git clone (paste the link you just copied)
   The repository will clone and you will be able to use it.
 
 # The project
