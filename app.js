@@ -1,4 +1,7 @@
 const express = require("express");
+const cors = require("cors");
+const app = express();
+app.use(cors());
 const {
   fetchTopics,
   fetchAllEndPoints,
@@ -10,11 +13,6 @@ const {
   deleteCommentByCommentId,
   fetchUsers,
 } = require(`./app/controllers/controllers.js`);
-
-const cors = require("cors");
-app.use(cors());
-
-const app = express();
 
 app.use(express.json());
 
