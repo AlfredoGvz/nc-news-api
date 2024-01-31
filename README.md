@@ -75,3 +75,10 @@
   # Requirements
 
   As of the moment of creation of this project, I am runing Node.js v21.2.0 and PostgreSQL v16.1
+
+  # API Reference
+  GET /api
+  GET /api/articles
+  GET /api/topics
+  
+  
