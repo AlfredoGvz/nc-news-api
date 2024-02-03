@@ -16,8 +16,8 @@ const {
 
 app.use(express.json());
 
-app.get("/api", fetchAllEndPoints);
 app.get("/api/topics", fetchTopics);
+app.get("/api", fetchAllEndPoints);
 app.get("/api/articles/:article_id", fetchArticlesById);
 app.get("/api/articles", fetchArticles);
 app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
@@ -58,6 +58,15 @@ app.use((err, req, res, next) => {
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
     res.status(400).send({ msg: "Bad request" });
+  } else {
+    next(err);
+  }
+});
+app.use((err, req, res, next) => {
+  if (err.code === "42703") {
+    res
+      .status(400)
+      .send({ msg: "Make sure you are using the right sorting criteria." });
   } else {
     next(err);
   }

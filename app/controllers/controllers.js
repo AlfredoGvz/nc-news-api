@@ -35,10 +35,9 @@ function fetchArticlesById(request, response, next) {
 }
 
 function fetchArticles(request, response, next) {
-  const { topic } = request.query;
-  getArticles(topic)
+  const { topic, order_by, order } = request.query;
+  getArticles(topic, order_by, order)
     .then((data) => {
-      // console.log(data, "artilcles");
       response.status(200).send({ articles: data });
     })
     .catch((err) => {

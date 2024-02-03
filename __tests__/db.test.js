@@ -77,6 +77,7 @@ describe("App", () => {
           votes: 100,
           article_img_url:
             "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+          comment_count: 11,
         };
         return request(app)
           .get("/api/articles/1")
@@ -90,6 +91,7 @@ describe("App", () => {
             expect(body.article[0]).toHaveProperty("created_at");
             expect(body.article[0]).toHaveProperty("votes");
             expect(body.article[0]).toHaveProperty("article_img_url");
+            expect(body.article[0]).toHaveProperty("comment_count");
 
             expect(body.article[0]).toMatchObject(article);
           });
@@ -118,7 +120,6 @@ describe("App", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            // console.log(body, "in the test");
             expect(body.articles).toBeInstanceOf(Array);
           });
       });
@@ -373,36 +374,91 @@ describe("App", () => {
     });
 
     //ticket 11
-    describe("GET /api/articles?query=query_val", () => {
+    describe("GET /api/articles?topic=query_val", () => {
       /*
       This query is linked to the fetchArticles() controller on line 38
       */
-      test("200- Filters out an item specified by the query.", () => {
+      test("200- Responds with an array of data.", () => {
         return request(app)
           .get("/api/articles?topic=mitch")
           .expect(200)
           .then(({ body }) => {
-            body.articles.forEach((article) => {
-              expect(article.topic).toBe("mitch");
-            });
+            const users = body.articles;
+            expect(users).toBeInstanceOf(Array);
+          });
+      });
+      test("200- Filters out items specified by the query.", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.every((article) => article.topic === "mitch");
           });
       });
 
-      test("200- Responds with an array of data sorted by query value.", () => {
-        return request(app)
-          .get("/api/articles?topic=mitch")
-          .expect(200)
-          .then(({ body }) => {
-            expect(body.articles).toBeSortedBy("topic");
-          });
-      });
       test("404- returns a 'Not found' message if value of query is not contained in the database.", () => {
         return request(app)
           .get("/api/articles?topic=elemental_variable")
           .expect(404)
           .then(({ body }) => {
-            // console.log();
             expect(body.msg).toBe("Not found");
+          });
+      });
+    });
+    describe("Get /api/articles?topic=query_val&sort_by=query_val", () => {
+      //Data validation - structure & content -> mergued two tests in one.
+      test("200- Responds with an array containing the right properties and data type.", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch&order_by=comment_count&order=ASC")
+          .expect(200)
+          .then(({ body }) => {
+            body.articles.forEach((article) => {
+              expect(article).toHaveProperty("article_id", expect.any(Number));
+              expect(article).toHaveProperty("title", expect.any(String));
+              expect(article).toHaveProperty("topic", expect.any(String));
+              expect(article).toHaveProperty("author", expect.any(String));
+              expect(article).toHaveProperty("created_at", expect.any(String));
+              expect(article).toHaveProperty("votes", expect.any(Number));
+              expect(article).toHaveProperty(
+                "article_img_url",
+                expect.any(String)
+              );
+              expect(article).toHaveProperty(
+                "comment_count",
+                expect.any(Number)
+              );
+            });
+          });
+      });
+      //Data validation - structure & content -> ordered by...
+      test("200- Responds with an array of filtered and sorted data.", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch&order_by=comment_count&order=ASC")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("comment_count", {
+              descending: false,
+            });
+          });
+      });
+      //Data validation - structure and content -> default values to sort and order.
+      test("200- Responds with an array of filtered and sorted data.", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles).toBeSortedBy("created_at", {
+              descending: true,
+            });
+          });
+      });
+      //Null/Empty Handling
+      test("400- Returns a 'Bad request' message when querying using invalid values", () => {
+        return request(app)
+          .get("/api/articles?topic=mitch&order_by=not_valid&order=not_valid")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("Bad request");
           });
       });
     });

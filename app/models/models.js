@@ -18,8 +18,12 @@ function collectingTopics() {
 function getArticlesById(article_id) {
   return db
     .query(
-      `SELECT * FROM articles
-       WHERE article_id = $1`,
+      `SELECT articles.*, CAST(COUNT(comments.comment_id) AS INT) AS comment_count
+FROM articles
+LEFT JOIN comments ON articles.article_id = comments.article_id
+WHERE articles.article_id = $1 
+GROUP BY articles.article_id;`,
+      //Count comments was returning a string value, so we cast it to parse it to a number
       [article_id]
     )
     .then(({ rows }) => {
@@ -30,8 +34,23 @@ function getArticlesById(article_id) {
     });
 }
 
-function getArticles(topic) {
+function getArticles(topic, order_by = "created_at", order = "DESC") {
   const queryValues = [];
+  const validSortingQueries = [
+    "title",
+    "author",
+    "created_at",
+    "comment_count",
+  ];
+  if (
+    !validSortingQueries.includes(order_by) ||
+    !order.match(/^(DESC|ASC)$/i)
+  ) {
+    return Promise.reject({
+      status: 400,
+      msg: "Invalid sorting criteria. Please use a valid column name and ASC or DESC order.",
+    });
+  }
   let queryString = `SELECT 
       articles.article_id,
       articles.title, 
@@ -40,17 +59,17 @@ function getArticles(topic) {
       articles.created_at, 
       articles.votes,
       articles.article_img_url, 
-      COUNT(comments.comment_id) AS comment_count
+      CAST(COUNT(comments.comment_id) AS INT) AS comment_count
       FROM articles 
       LEFT JOIN comments ON 
-      articles.article_id = comments.article_id `;
+      articles.article_id = comments.article_id`;
 
+  // Conditionally add WHERE clause
   if (topic) {
-    queryString += `WHERE articles.topic=$1`;
+    queryString += ` WHERE articles.topic=$1`;
     queryValues.push(topic);
   }
-
-  queryString += ` GROUP BY articles.article_id`;
+  queryString += ` GROUP BY articles.article_id ORDER BY ${order_by} ${order}`;
 
   return db.query(queryString, queryValues).then(({ rows }) => {
     if (rows.length === 0) {
