@@ -8,7 +8,7 @@ const {
   updateArticle,
   deleteComment,
   getUsers,
-  filteredArticles,
+  getUsersByUsername,
 } = require("../models/models.js");
 function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
@@ -96,7 +96,14 @@ function fetchUsers(request, response, next) {
     .catch((err) => next(err));
 }
 
-function filterArticlesByTopic(request, response, next) {}
+function fetchUsersByUsername(request, response, next) {
+  const { username } = request.params;
+  getUsersByUsername(username)
+    .then((user) => {
+      response.status(200).send({ user: user });
+    })
+    .catch((err) => next(err));
+}
 
 module.exports = {
   fetchTopics,
@@ -108,5 +115,5 @@ module.exports = {
   updateArticleById,
   deleteCommentByCommentId,
   fetchUsers,
-  filterArticlesByTopic,
+  fetchUsersByUsername,
 };

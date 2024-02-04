@@ -404,7 +404,7 @@ describe("App", () => {
           });
       });
     });
-    describe("Get /api/articles?topic=query_val&sort_by=query_val", () => {
+    describe("GET /api/articles?topic=query_val&sort_by=query_val", () => {
       //Data validation - structure & content -> mergued two tests in one.
       test("200- Responds with an array containing the right properties and data type.", () => {
         return request(app)
@@ -458,6 +458,42 @@ describe("App", () => {
           .expect(400)
           .then(({ body }) => {
             expect(body.msg).toBe("Bad request");
+          });
+      });
+    });
+    describe("GET /api/users/:username", () => {
+      test("200- Returns an array of data.", () => {
+        return request(app)
+          .get("/api/users/butter_bridge")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.user).toBeInstanceOf(Array);
+          });
+      });
+      test("200- Returns an array containing the right data.", () => {
+        const user = {
+          username: "butter_bridge",
+          name: "jonny",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        };
+
+        return request(app)
+          .get("/api/users/butter_bridge")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.user[0]).toHaveProperty("username");
+            expect(body.user[0]).toHaveProperty("name");
+            expect(body.user[0]).toHaveProperty("avatar_url");
+            expect(body.user[0]).toEqual(user);
+          });
+      });
+      test("404- Returns a message of 'User not found' if user does not exist", () => {
+        return request(app)
+          .get("/api/users/i_don't_exist_:D")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("User not found");
           });
       });
     });

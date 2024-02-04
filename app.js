@@ -2,29 +2,24 @@ const express = require("express");
 const cors = require("cors");
 const app = express();
 app.use(cors());
-const {
-  fetchTopics,
-  fetchAllEndPoints,
-  fetchArticlesById,
-  fetchArticles,
-  fetchCommentsByArticleId,
-  addCommentToArticle,
-  updateArticleById,
-  deleteCommentByCommentId,
-  fetchUsers,
-} = require(`./app/controllers/controllers.js`);
+
+const apiRouter = require("./routes/api-router.js");
+const usersRouter = require("./routes/users-router.js");
+const topicsRouter = require("./routes/topics-router.js");
+const articlesRouter = require("./routes/articles-router.js");
+const commentsRouter = require("./routes/comments-router.js");
 
 app.use(express.json());
 
-app.get("/api/topics", fetchTopics);
-app.get("/api", fetchAllEndPoints);
-app.get("/api/articles/:article_id", fetchArticlesById);
-app.get("/api/articles", fetchArticles);
-app.get("/api/articles/:article_id/comments", fetchCommentsByArticleId);
-app.post("/api/articles/:article_id/comments", addCommentToArticle);
-app.patch("/api/articles/:article_id", updateArticleById);
-app.delete("/api/comments/:comment_id", deleteCommentByCommentId);
-app.get("/api/users", fetchUsers);
+app.use("/api/topics", topicsRouter);
+
+app.use("/api", apiRouter);
+
+app.use("/api/articles", articlesRouter);
+
+app.use("/api/comments", commentsRouter);
+
+app.use("/api/users", usersRouter);
 
 //================================================//
 
@@ -34,7 +29,9 @@ app.all("/*", (req, res) => {
 
 //custom errors
 app.use((err, req, res, next) => {
-  if (err.status === 404) {
+  if (err.status === 404 && err.msg === "User not found") {
+    res.status(404).send({ msg: "User not found" });
+  } else if (err.status === 404 && err.msg === "Not found") {
     res.status(404).send({ msg: "Not found" });
   } else {
     next(err);

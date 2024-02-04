@@ -149,7 +149,16 @@ function getUsers() {
   });
 }
 
-function filteredArticles(topic) {}
+function getUsersByUsername(username) {
+  return db
+    .query("SELECT * FROM users WHERE username=$1", [username])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "User not found" });
+      }
+      return rows;
+    });
+}
 module.exports = {
   collectingTopics,
   getEndpoints,
@@ -160,5 +169,5 @@ module.exports = {
   updateArticle,
   deleteComment,
   getUsers,
-  filteredArticles,
+  getUsersByUsername,
 };
