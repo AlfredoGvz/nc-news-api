@@ -72,6 +72,7 @@ function getArticles(topic, order_by = "created_at", order = "DESC") {
   queryString += ` GROUP BY articles.article_id ORDER BY ${order_by} ${order}`;
 
   return db.query(queryString, queryValues).then(({ rows }) => {
+    console.log(rows);
     if (rows.length === 0) {
       return Promise.reject({ status: 404, msg: "Not found" });
     }
@@ -159,6 +160,38 @@ function getUsersByUsername(username) {
       return rows;
     });
 }
+
+function insertNewPost(body) {
+  if (!body.title) {
+    return Promise.reject({ status: 400, msg: "Missing article title" });
+  } else if (!body.topic) {
+    return Promise.reject({ status: 400, msg: "Missing article topic" });
+  } else if (!body.author) {
+    return Promise.reject({ status: 400, msg: "Missing article author" });
+  } else if (!body.body) {
+    return Promise.reject({ status: 400, msg: "Missing article body" });
+  } else if (!body.article_img_url) {
+    return Promise.reject({ status: 400, msg: "Missing article image url" });
+  }
+  return db
+    .query(
+      format(
+        `
+    INSERT INTO articles 
+    (title, topic, author, body, article_img_url)
+    VALUES %L
+    RETURNING *`,
+        [[body.title, body.topic, body.author, body.body, body.article_img_url]]
+      )
+    )
+    .then(({ rows }) => {
+      return rows;
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
 module.exports = {
   collectingTopics,
   getEndpoints,
@@ -170,4 +203,5 @@ module.exports = {
   deleteComment,
   getUsers,
   getUsersByUsername,
+  insertNewPost,
 };

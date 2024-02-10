@@ -9,6 +9,7 @@ const {
   deleteComment,
   getUsers,
   getUsersByUsername,
+  insertNewPost,
 } = require("../models/models.js");
 function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
@@ -104,6 +105,14 @@ function fetchUsersByUsername(request, response, next) {
     })
     .catch((err) => next(err));
 }
+function postArticle(request, response, next) {
+  const { body } = request;
+  insertNewPost(body)
+    .then((article) => {
+      response.status(201).send({ post: article });
+    })
+    .catch((error) => next(error));
+}
 
 module.exports = {
   fetchTopics,
@@ -116,4 +125,5 @@ module.exports = {
   deleteCommentByCommentId,
   fetchUsers,
   fetchUsersByUsername,
+  postArticle,
 };

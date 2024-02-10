@@ -457,7 +457,9 @@ describe("App", () => {
           .get("/api/articles?topic=mitch&order_by=not_valid&order=not_valid")
           .expect(400)
           .then(({ body }) => {
-            expect(body.msg).toBe("Bad request");
+            expect(body.msg).toBe(
+              "Invalid sorting criteria. Please use a valid column name and ASC or DESC order."
+            );
           });
       });
     });
@@ -494,6 +496,118 @@ describe("App", () => {
           .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("User not found");
+          });
+      });
+    });
+    describe("POST /api/articles", () => {
+      test("200- Successful request returns an array of data containing the onject with information posted.", () => {
+        const articlePost = {
+          title: "100 reasons to watch anime",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "Well, for one, anime is good. For 99, anime is really good.",
+          article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(201)
+          .then(({ body }) => {
+            expect(body.post[0]).toMatchObject({
+              article_id: expect.any(Number),
+              title: "100 reasons to watch anime",
+              topic: "mitch",
+              author: "butter_bridge",
+              body: "Well, for one, anime is good. For 99, anime is really good.",
+              created_at: expect.any(String),
+              votes: expect.any(Number),
+              article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+            });
+          });
+      });
+      test("400- Returns a message that article title is missing.", () => {
+        const articlePost = {
+          title: null,
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "Well, for one, anime is good. For 99, anime is really good.",
+          article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(400)
+          .then(({ body }) => {
+            // console.log(body.post[0]);
+            expect(body.msg).toBe("Missing article title");
+          });
+      });
+      test("400- Returns a message that article topic is missing.", () => {
+        const articlePost = {
+          title: "100 reasons to watch anime",
+          topic: null,
+          author: "butter_bridge",
+          body: "Well, for one, anime is good. For 99, anime is really good.",
+          article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(400)
+          .then(({ body }) => {
+            // console.log(body.post[0]);
+            expect(body.msg).toBe("Missing article topic");
+          });
+      });
+      test("400- Returns a message that article author is missing.", () => {
+        const articlePost = {
+          title: "100 reasons to watch anime",
+          topic: "mitch",
+          author: null,
+          body: "Well, for one, anime is good. For 99, anime is really good.",
+          article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(400)
+          .then(({ body }) => {
+            // console.log(body.post[0]);
+            expect(body.msg).toBe("Missing article author");
+          });
+      });
+      test("400- Returns a message that article body is missing.", () => {
+        const articlePost = {
+          title: "100 reasons to watch anime",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: null,
+          article_img_url: "https://wallpapercave.com/wp/iESNQzi.jpg",
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(400)
+          .then(({ body }) => {
+            // console.log(body.post[0]);
+            expect(body.msg).toBe("Missing article body");
+          });
+      });
+      test("400- Returns a message that article image url is missing.", () => {
+        const articlePost = {
+          title: "100 reasons to watch anime",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "Well, for one, anime is good. For 99, anime is really good.",
+          article_img_url: null,
+        };
+        return request(app)
+          .post("/api/articles")
+          .send(articlePost)
+          .expect(400)
+          .then(({ body }) => {
+            // console.log(body.post[0]);
+            expect(body.msg).toBe("Missing article image url");
           });
       });
     });
