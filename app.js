@@ -38,8 +38,24 @@ app.use((err, req, res, next) => {
   }
 });
 app.use((err, req, res, next) => {
-  if (err.status === 400) {
-    res.status(400).send({ msg: "Bad request" });
+  if (
+    err.status === 400 &&
+    err.msg ===
+      "Invalid sorting criteria. Please use a valid column name and ASC or DESC order."
+  ) {
+    res.status(400).send({
+      msg: "Invalid sorting criteria. Please use a valid column name and ASC or DESC order.",
+    });
+  } else if (err.status === 400 && err.msg === "Missing article title") {
+    res.status(400).send({ msg: "Missing article title" });
+  } else if (err.status === 400 && err.msg === "Missing article topic") {
+    res.status(400).send({ msg: "Missing article topic" });
+  } else if (err.status === 400 && err.msg === "Missing article author") {
+    res.status(400).send({ msg: "Missing article author" });
+  } else if (err.status === 400 && err.msg === "Missing article body") {
+    res.status(400).send({ msg: "Missing article body" });
+  } else if (err.status === 400 && err.msg === "Missing article image url") {
+    res.status(400).send({ msg: "Missing article image url" });
   } else {
     next(err);
   }
