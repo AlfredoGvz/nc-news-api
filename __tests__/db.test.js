@@ -513,7 +513,6 @@ describe("App", () => {
           .send(articlePost)
           .expect(201)
           .then(({ body }) => {
-            console.log(body.post[0]);
             expect(body.post[0]).toMatchObject({
               article_id: expect.any(Number),
               title: "100 reasons to watch anime",
