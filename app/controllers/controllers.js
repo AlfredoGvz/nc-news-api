@@ -10,6 +10,7 @@ const {
   getUsers,
   getUsersByUsername,
   insertNewPost,
+  postMessage,
 } = require("../models/models.js");
 function fetchAllEndPoints(request, response, next) {
   getEndpoints().then((data) => {
@@ -114,6 +115,14 @@ function postArticle(request, response, next) {
     .catch((error) => next(error));
 }
 
+function sendEmail(request, response, next) {
+  const { senderEmail, senderName, emailSubject, message } = request.body;
+  postMessage(senderEmail, senderName, emailSubject, message).then(
+    (messageSent) => {
+      response.status(200).send({ msg: messageSent });
+    }
+  );
+}
 module.exports = {
   fetchTopics,
   fetchAllEndPoints,
@@ -126,4 +135,5 @@ module.exports = {
   fetchUsers,
   fetchUsersByUsername,
   postArticle,
+  sendEmail,
 };

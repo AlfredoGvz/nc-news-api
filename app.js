@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const app = express();
+
 app.use(cors());
 
 const apiRouter = require("./routes/api-router.js");
@@ -8,6 +9,7 @@ const usersRouter = require("./routes/users-router.js");
 const topicsRouter = require("./routes/topics-router.js");
 const articlesRouter = require("./routes/articles-router.js");
 const commentsRouter = require("./routes/comments-router.js");
+const { sendEmail } = require("./app/controllers/controllers.js");
 
 app.use(express.json());
 
@@ -20,6 +22,8 @@ app.use("/api/articles", articlesRouter);
 app.use("/api/comments", commentsRouter);
 
 app.use("/api/users", usersRouter);
+
+app.post("/api/contact", sendEmail);
 
 //================================================//
 

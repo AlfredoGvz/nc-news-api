@@ -2,7 +2,7 @@ const db = require("../../db/connection.js");
 const { checkArticleExists, checkCommentExists } = require("../utilities.js");
 const fs = require("fs/promises");
 const format = require("pg-format");
-
+import emailjs from "@emailjs/browser";
 function getEndpoints() {
   return fs.readFile("endpoints.json", "utf-8").then((info) => {
     return JSON.parse(info);
@@ -69,7 +69,7 @@ function getArticles(topic, order_by = "created_at", order = "DESC") {
     queryString += ` WHERE articles.topic=$1`;
     queryValues.push(topic);
   }
-  queryString += ` GROUP BY articles.article_id ORDER BY ${order_by} ${order}`;
+  queryString += ` GROUP BY articles.article_id ORDER BY ${order_by} ${order} LIMIT 10 OFFSET 2+1`;
 
   return db.query(queryString, queryValues).then(({ rows }) => {
     console.log(rows);
@@ -127,6 +127,7 @@ function updateArticle(article_id, vote_update) {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "Not found" });
       }
+      console.log(rows);
       return rows;
     });
 }
@@ -191,6 +192,28 @@ function insertNewPost(body) {
       console.log(error);
     });
 }
+function postMessage(senderEmail, senderName, emailSubject, message) {
+  console.log(senderEmail, senderName, emailSubject, message);
+  const service_id = process.env.REACT_APP_SERVICE_ID;
+  const template_id = process.env.REACT_APP_TEMPLATE_ID;
+  const user_id = process.env.REACT_APP_USER_ID;
+  const public_key = process.env.REACT_APP_PUBLIC_KEY;
+  const templateParams = {
+    to_name: "Alfredo",
+    from_name: senderName,
+    from_email: senderEmail,
+    message: message,
+    subject: emailSubject,
+  };
+  emailjs
+    .send(service_id, template_id, templateParams, public_key)
+    .then((response) => {
+      console.log(response);
+    })
+    .catch((e) => {
+      console.log(e);
+    });
+}
 
 module.exports = {
   collectingTopics,
@@ -204,4 +227,5 @@ module.exports = {
   getUsers,
   getUsersByUsername,
   insertNewPost,
+  postMessage,
 };
