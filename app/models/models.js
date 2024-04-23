@@ -2,7 +2,7 @@ const db = require("../../db/connection.js");
 const { checkArticleExists, checkCommentExists } = require("../utilities.js");
 const fs = require("fs/promises");
 const format = require("pg-format");
-import emailjs from "@emailjs/browser";
+const emailjs = require("@emailjs/browser");
 function getEndpoints() {
   return fs.readFile("endpoints.json", "utf-8").then((info) => {
     return JSON.parse(info);
@@ -194,6 +194,7 @@ function insertNewPost(body) {
 }
 function postMessage(senderEmail, senderName, emailSubject, message) {
   console.log(senderEmail, senderName, emailSubject, message);
+
   const service_id = process.env.REACT_APP_SERVICE_ID;
   const template_id = process.env.REACT_APP_TEMPLATE_ID;
   const user_id = process.env.REACT_APP_USER_ID;
@@ -205,6 +206,7 @@ function postMessage(senderEmail, senderName, emailSubject, message) {
     message: message,
     subject: emailSubject,
   };
+  console.log(service_id);
   emailjs
     .send(service_id, template_id, templateParams, public_key)
     .then((response) => {
